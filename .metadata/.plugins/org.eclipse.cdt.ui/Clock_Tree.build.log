@@ -1,0 +1,17 @@
+11:01:53 **** Incremental Build of configuration Debug for project Clock_Tree ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F446xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "Clock_Tree.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\newto\STM32CubeIDE\workspace_1.16.0\Clock_Tree\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Clock_Tree.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: Clock_Tree.elf
+ 
+arm-none-eabi-size  Clock_Tree.elf 
+arm-none-eabi-objdump -h -S Clock_Tree.elf  > "Clock_Tree.list"
+   text	   data	    bss	    dec	    hex	filename
+  10820	    104	   1912	  12836	   3224	Clock_Tree.elf
+Finished building: default.size.stdout
+ 
+Finished building: Clock_Tree.list
+ 
+
+11:01:54 Build Finished. 0 errors, 0 warnings. (took 1s.141ms)
+

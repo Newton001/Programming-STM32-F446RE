@@ -1,0 +1,6 @@
+2024-08-06 18:37:30,729 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 18:37:30.694 ERROR Chromium process exit code: -2,147,483,645
+2024-08-06 18:37:30,782 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2024-08-06 18:37:30,783 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 18:37:30.783 ERROR Crash dump dir: C:\Users\newto\AppData\Local\JxBrowser\7.38.2\CrashReports
+2024-08-06 18:37:30,784 [ERROR] LogOutputStream:75 - [STDERR_REDIRECT] 
+2024-08-06 18:37:30,791 [ERROR] WebApp:397 - JxBrowser engine crashed! Exit code: -2147483645
+2024-08-06 18:37:30,792 [ERROR] WebAppUi:468 - JxBrowser engine crashed! Exit code: -2147483645

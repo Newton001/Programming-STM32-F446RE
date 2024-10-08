@@ -1,0 +1,10 @@
+10:56:11 **** Incremental Build of configuration Debug for project Binary_Count ****
+make -j12 all 
+arm-none-eabi-size  Binary_Count.elf 
+   text	   data	    bss	    dec	    hex	filename
+  10796	    104	   1912	  12812	   320c	Binary_Count.elf
+Finished building: default.size.stdout
+ 
+
+10:56:11 Build Finished. 0 errors, 0 warnings. (took 260ms)
+

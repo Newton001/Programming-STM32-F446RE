@@ -1,0 +1,56 @@
+/*
+ * speaker.c
+ *
+ *  Created on: Oct 22, 2024
+ *      Author: newton
+ */
+
+#include "speaker.h"
+
+void StopNote()
+{
+	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
+}
+
+uint8_t getNoteIndex(char note)
+{
+	switch(note)
+	{
+	case 'C': return 0;
+	case 'c': return 1;
+	case 'D': return 2;
+	case 'd': return 3;
+	case 'E': return 4;
+	case 'F': return 5;
+	case 'f': return 6;
+	case 'G': return 7;
+	case 'g': return 8;
+	case 'A': return 9;
+	case 'a': return 10;
+	case 'B': return 11;
+	default: return -1;
+	}
+}
+
+void playNoteFrequency(uint32_t frequency)
+{
+	if(frequency > 0)
+	{
+		/* Calculate the timer period for the given frequency */
+		uint32_t timerPeriod = (SystemCoreClock / (frequency * 2)) - 1;  // Timer clock / (2 * frequency)
+
+		/* Update the period dynamically */
+		__HAL_TIM_SET_AUTORELOAD(&htim2, timerPeriod);
+
+		/* Set a 50% duty cycle for the note (can be adjusted) */
+		uint32_t pulseValue = timerPeriod / 2;
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, pulseValue);
+
+		/* Start the PWM signal */
+		HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+	}
+	else
+	{
+		HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_3);
+	}
+}

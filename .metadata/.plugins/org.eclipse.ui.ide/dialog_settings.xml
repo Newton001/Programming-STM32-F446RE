@@ -12,6 +12,8 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+			<item value="C:\Users\newto\OneDrive\BioMedicalEngineering\Notes and Class Documents\HS2024\01_Programming_Microcontrollers\Week 5\T_5_2\T5_2_UartRxBuffer"/>
+			<item value="C:\Users\newto\Downloads\T_4_3_3\T_4_3_3"/>
 			<item value="C:\Users\newto\STM32CubeIDE\workspace_1.16.0"/>
 		</list>
 	</section>

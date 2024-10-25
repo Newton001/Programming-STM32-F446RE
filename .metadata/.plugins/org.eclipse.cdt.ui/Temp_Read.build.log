@@ -1,0 +1,10 @@
+11:42:17 **** Incremental Build of configuration Debug for project Temp_Read ****
+make -j12 all 
+arm-none-eabi-size  Temp_Read.elf 
+   text	   data	    bss	    dec	    hex	filename
+  34424	    468	   2068	  36960	   9060	Temp_Read.elf
+Finished building: default.size.stdout
+ 
+
+11:42:17 Build Finished. 0 errors, 0 warnings. (took 289ms)
+

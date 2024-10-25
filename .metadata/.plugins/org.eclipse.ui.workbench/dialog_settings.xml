@@ -18,9 +18,18 @@
 		<item key="WizardZipFileResourceExportPage1.STORE_CREATE_STRUCTURE_ID" value="true"/>
 		<item key="WizardZipFileResourceExportPage1.STORE_COMPRESS_CONTENTS_ID" value="true"/>
 		<list key="WizardZipFileResourceExportPage1.STORE_DESTINATION_NAMES_ID">
+			<item value="C:\Users\newto\OneDrive\BioMedicalEngineering\Notes and Class Documents\HS2024\01_Programming_Microcontrollers\Assignment\Ex02_OllengoNewton_Music.zip"/>
 			<item value="C:\Users\newto\OneDrive\BioMedicalEngineering\Notes and Class Documents\HS2024\01_Programming_Microcontrollers\Assignment\Ex01_OllengoNewton_Binary.zip"/>
 			<item value="Ex01_OllengoNewton_Binary.zip"/>
 			<item value="Ex01_OllengoNewton.zip"/>
+		</list>
+	</section>
+	<section name="FileSystemImportWizard">
+	</section>
+	<section name="NewWizardAction">
+		<item key="NewWizardSelectionPage.STORE_SELECTED_ID" value="org.eclipse.cdt.ui.wizards.NewSourceFileCreationWizard"/>
+		<list key="NewWizardSelectionPage.STORE_EXPANDED_CATEGORIES_ID">
+			<item value="org.eclipse.cdt.ui.newCWizards"/>
 		</list>
 	</section>
 </section>

@@ -1,0 +1,2 @@
+../thermo/Src/thermo.c:13:7:calcTemp	16	static
+../thermo/Src/thermo.c:18:7:readTemp	24	static

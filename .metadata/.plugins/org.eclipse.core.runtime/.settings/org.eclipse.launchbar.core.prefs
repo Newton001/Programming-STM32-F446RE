@@ -25,6 +25,9 @@ org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:SuperPooling\ Debug/activeLaunc
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:SuperPooling\ Debug/activeLaunchTarget=null\:---
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:T5-1-UART\ Debug/activeLaunchTarget=null\:---
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:T5_2_UartRxBuffer\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:T_6_1_DigitalThermometer\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Temp_Read\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:Thermometer_LCD_Display\ Debug/activeLaunchTarget=null\:---
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:USART_Test1\ Debug/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:USART_Test1\ Debug/activeLaunchTarget=null\:---
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:blinking_led\ Debug/activeLaunchMode=debug

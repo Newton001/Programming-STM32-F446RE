@@ -1,0 +1,3 @@
+../thermo/Src/thermo.c:12:7:calcTemp	2
+../thermo/Src/thermo.c:22:7:readTemp	2
+../thermo/Src/thermo.c:34:7:readTemp2	3

@@ -1,0 +1,86 @@
+/*
+ * mma7660fc.c
+ *
+ *  Created on: Oct 29, 2024
+ *      Author: newton
+ */
+
+#ifndef MMA7660FC_H
+#define MMA7660FC_H
+
+#include "i2c.h"
+#include "stm32f4xx_hal.h"
+
+
+// Define the addresses to be used from the MMA7660FC
+#define DEVICE_ADDRESS (0x4C<<1)
+#define XOUT_REG 0x00
+#define YOUT_REG 0x01
+#define ZOUT_REG 0x02
+#define TILT_REG 0x03 // Tilt Status
+#define SRST_REG 0x04 // Sampling Rate Status
+#define SPCNT 	 0x05 // Sleep Count
+#define INTSU 	 0x06 // Interrupt Set Up
+#define MODE_REG 0x07
+#define SR 		 0x08 //  Auto-Wake/Sleep and Portrait/Landscape samples per seconds and Debounce Filter
+#define PDET	 0x09 // Tap Detection
+#define PD       0x0A // Tap Debounce Count
+
+#define MMA7660_ACTIVE_MODE 0x01
+#define MMA7660_SAMPLE_RATE_32HZ 0x03 // Configured for 32 samples per second (optional)
+
+#define TEST_MODE 0
+
+
+// Simple Function to detect Device on the I2C Bus
+
+void sensorDetect(void)
+{
+	HAL_StatusTypeDef ret = HAL_I2C_IsDeviceReady(&hi2c1, (DEVICE_ADDRESS + 0), 1, 100);
+
+	if(ret ==  HAL_OK)
+		printf("The Sensor is connected");
+	else
+		printf("The Device cannot be detected");
+}
+
+void mma7660_init(void)
+{
+	if(mma7660_WriteRegister(SR_REG, MMA7660_SAMPLE_RATE_32HZ)!=HAL_OK)
+	{
+		Error_Handler();
+	}
+
+	if(mma7660_WriteRegister(MODE_REG, MMA7660_ACTIVE_MODE)!=HAL_OK)
+	{
+		Error_Handler();
+	}
+}
+
+
+// Read Data from a single Byte from a Register
+void mma7660_ReadRegister(I2C_HandleTypeDef *hi2c, uint8_t reg)
+{
+	uint8_t data;
+	HAL_I2C_Mem_Read(hi2c, DEVICE_ADDRESS, reg, I2C_MEMADD_SIZE_8BIT, &data, 1, 100);
+	return data;
+}
+
+void mma7660_ReadAcceleration(I2C_HandleTypeDef *hi2c, int8_t *x, int8_t *y, int8_t *z)
+{
+	*x = (int8_t)mma7660_ReadRegister(hi2c1,XOUT_REG);
+	*y = (int8_t)mma7660_ReadRegister(hi2c1,YOUT_REG);
+	*z = (int8_t)mma7660_ReadRegister(hi2c1,ZOUT_REG);
+}
+
+// Write a Single Byte of Data to an address
+HAL_StatusTypeDef mma7660_WriteRegister(uint8_t reg, uint8_t data)
+{
+	return HAL_I2C_Mem_Write(&hi2c1, DEVICE_ADDRESS, reg, I2C_MEMADD_SIZE_8BIT, &data, 1, 100);
+}
+
+
+
+
+
+#endif /* MMA7660FC_H_ */

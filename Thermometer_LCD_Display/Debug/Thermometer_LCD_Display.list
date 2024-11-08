@@ -1710,7 +1710,7 @@ int main(void)
 		        float tmp = readTemp();     // read actual temperature
  8001266:	f004 fb8d 	bl	8005984 <readTemp>
  800126a:	ed87 0a09 	vstr	s0, [r7, #36]	@ 0x24
-		        sprintf(msgBuf, "Temperature: %2.1f%cC", tmp, 0x80); // fill message buffer
+		        sprintf(msgBuf, "Temperature: %2.2f %cC", tmp, 0x80); // fill message buffer
  800126e:	6a78      	ldr	r0, [r7, #36]	@ 0x24
  8001270:	f7ff f98a 	bl	8000588 <__aeabi_f2d>
  8001274:	4602      	mov	r2, r0

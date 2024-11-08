@@ -117,7 +117,7 @@ int main(void)
 	lcd_setLine(0,0,0,31,1);
 	lcd_setString(4,3,"All Ladies say", LCD_FONT_8,false);
 	lcd_setString(4,15,"'WE LOVE ❤️ ' ",LCD_FONT_8,false);
-	lcd_setString(4,25,"  K - man!  ",LCD_FONT_8,false);
+	lcd_setString(4,25," THE  K - man!  ",LCD_FONT_8,false);
 	lcd_show();
 	HAL_Delay(2500);
 	lcd_clear();
@@ -147,7 +147,7 @@ int main(void)
 		if (doUpdate) {
 		        doUpdate = 0;               // reset update flag
 		        float tmp = readTemp();     // read actual temperature
-		        sprintf(msgBuf, "Temperature: %2.1f%cC", tmp, 0x80); // fill message buffer
+		        sprintf(msgBuf, "Temperature: %2.2f %cC", tmp, 0x80); // fill message buffer
 		        lcd_clear();
 
 		        // Display temperature at current y-position

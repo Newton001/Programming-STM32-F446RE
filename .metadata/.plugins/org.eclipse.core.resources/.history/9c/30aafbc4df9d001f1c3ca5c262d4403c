@@ -1,0 +1,26 @@
+/*
+ * rc522.c
+ *
+ *  Created on: Nov 3, 2024
+ *      Author: newton
+ */
+
+#include "rc522.h"
+uint8_t RC522_SPI_Transfer(uint8_t tx_data)
+{
+	uint8_t rx_data;
+	HAL_SPI_TransmitReceive(&hspi1, &tx_data, &rx_data, 1, 100);
+	return rx_data;
+}
+
+void write_RC522(UINT8_T ADD, uint8_t val)
+{
+	//Pull the Chip Select Pin Down to activate the RFID
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+	RC522_SPI_Transfer((ADD<<1)&0x7E);
+	RC522_SPI_Transfer(val);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
+
+}
+
+

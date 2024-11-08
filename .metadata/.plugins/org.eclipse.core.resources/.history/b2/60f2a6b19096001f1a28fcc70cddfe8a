@@ -1,0 +1,22 @@
+/*
+ * mma7660fc.c
+ *
+ *  Created on: Oct 29, 2024
+ *      Author: newton
+ */
+
+#ifndef MMA7660FC_H
+#define MMA7660FC_H
+
+#include "i2c.h"
+#include "stm32f4xx_hal.h"
+
+#define ACCEL_ADDRESS 0x4C
+#define TEST_MODE 0
+
+
+// Simple Function to detect Devices on the I2C Bus
+
+
+
+#endif /* MMA7660FC_H_ */

@@ -1,0 +1,15 @@
+/*
+ * mma7660fc.c
+ *
+ *  Created on: Oct 29, 2024
+ *      Author: newton
+ */
+
+#ifndef MMA7660FC_H
+#define MMA7660FC_H
+
+#define ACCEL_ADDRESS 0x90
+#define TEST_MODE 0
+
+
+#endif /* MMA7660FC_H_ */

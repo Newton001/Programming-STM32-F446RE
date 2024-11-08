@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2024 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -28,6 +28,7 @@
 /* USER CODE BEGIN Includes */
 #include "mma7660fc.h"
 #include "lcd_driver.h"
+#include "stdio.h"
 
 /* USER CODE END Includes */
 
@@ -38,7 +39,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define MAX_LINES 4
+#define LINE_HEIGHT 8
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,12 +51,19 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+int doUpdate = 0;
+int yPosition = 4;  //initial Vertical Position
+char lcdBuffer[MAX_LINES][38]; // Buffer to hold the last few lines of text
+int currentLine = 0; // Track the current line position
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+int _write(int fd, char*ptr, int len); // Lets redirect to printf for ease in application
+void updateLCD(void);
+void displayWelcome();
 
 /* USER CODE END PFP */
 
@@ -97,17 +106,39 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+	displayWelcome();
+
+	// Initialize the LCD
+	lcd_init();
+	lcd_clear();
+
+	lcd_setLine(127, 0, 127, 31, 1);
+	lcd_setLine(0, 0, 0, 31, 1);
+	lcd_setString(4, 3, " System Initialization Test ", LCD_FONT_8, false);
+	lcd_setString(4, 15, " I2C connection Done", LCD_FONT_8, false);
+	lcd_setString(4, 25, "Accelerometer connection Done", LCD_FONT_8, false);
+	lcd_show();
+	HAL_Delay(2500);
+	lcd_clear();
+
+	// Start the Timer
+	HAL_TIM_Base_Start_IT(&htim7);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+	while (1)
+	{
+		if (doUpdate) {
+			doUpdate = 0; // Reset the flag
+			updateLCD();  // Update the LCD with new data
+			HAL_Delay(200); // Adjust as necessary
+		}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+	}
   /* USER CODE END 3 */
 }
 
@@ -153,6 +184,56 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+int _write(int fd, char *ptr, int len)
+{
+	if(HAL_UART_Transmit(&huart2, (uint8_t *)ptr, len, HAL_MAX_DELAY)==HAL_OK)
+	{
+		return len;
+	}
+	else
+		return -1;
+}
+
+// NOTE: Carriage return "\r" helps for nice console output
+void displayWelcome()
+{
+	puts("******** System Initialization Test ******** \r\n");
+	puts("- Uart connection ... Done\r\n");
+	puts("- printf retargeting to uart ... Done\r\n");
+	puts("- Accelerometer connection ... Done\r\n");
+	puts("***************************** \r\n");
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	doUpdate = 1;
+}
+
+void updateLCD(void) {
+	// Read acceleration values
+	uint8_t x, y, z;
+	mma7660_ReadAcceleration(&hi2c1, &x, &y, &z);
+
+	// Print to console (optional)
+	printf("Acceleration X: %d, Y: %d, Z: %d\n\r", x, y, z);
+
+	// Format the message
+	snprintf(lcdBuffer[currentLine], sizeof(lcdBuffer[currentLine]), "X:%d   Y:%d   Z:%d", x, y, z);
+
+	// Update the line for the next entry
+	currentLine++;
+	if (currentLine >= MAX_LINES) {
+		currentLine = 0;
+	}
+
+	// Clear LCD and redraw all lines to simulate scrolling
+	lcd_clear();
+	for (int i = 0; i < MAX_LINES; i++) {
+		int lineIndex = (currentLine + i) % MAX_LINES; // Circular buffer indexing
+		lcd_setString(4, i * LINE_HEIGHT, lcdBuffer[lineIndex], LCD_FONT_8, false);
+	}
+	lcd_show();
+}
 
 /* USER CODE END 4 */
 
@@ -163,11 +244,11 @@ void SystemClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1)
+	{
+	}
   /* USER CODE END Error_Handler_Debug */
 }
 
@@ -182,7 +263,7 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
+	/* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }

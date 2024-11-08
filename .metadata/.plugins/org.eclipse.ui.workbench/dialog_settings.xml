@@ -9,15 +9,20 @@
 	</section>
 	<section name="ImportExportAction">
 		<item key="ImportExportPage.STORE_SELECTED_EXPORT_WIZARD_ID" value="org.eclipse.ui.wizards.export.ZipFile"/>
+		<item key="ImportExportPage.STORE_SELECTED_IMPORT_WIZARD_ID" value="org.eclipse.ui.wizards.import.ExternalProject"/>
 		<list key="ImportExportPage.STORE_EXPANDED_EXPORT_CATEGORIES">
 			<item value="org.eclipse.ui.Basic"/>
 			<item value="org.eclipse.team.ui.exportWizards"/>
+		</list>
+		<list key="ImportExportPage.STORE_EXPANDED_IMPORT_CATEGORIES">
+			<item value="org.eclipse.ui.Basic"/>
 		</list>
 	</section>
 	<section name="ZipFileExportWizard">
 		<item key="WizardZipFileResourceExportPage1.STORE_CREATE_STRUCTURE_ID" value="true"/>
 		<item key="WizardZipFileResourceExportPage1.STORE_COMPRESS_CONTENTS_ID" value="true"/>
 		<list key="WizardZipFileResourceExportPage1.STORE_DESTINATION_NAMES_ID">
+			<item value="C:\Users\newto\OneDrive\BioMedicalEngineering\Notes and Class Documents\HS2024\01_Programming_Microcontrollers\Assignment\Assignment III\Ex03_DigitalAccelerometer.zip"/>
 			<item value="C:\Users\newto\OneDrive\BioMedicalEngineering\Notes and Class Documents\HS2024\01_Programming_Microcontrollers\Assignment\Ex02_OllengoNewton_Music.zip"/>
 			<item value="C:\Users\newto\OneDrive\BioMedicalEngineering\Notes and Class Documents\HS2024\01_Programming_Microcontrollers\Assignment\Ex01_OllengoNewton_Binary.zip"/>
 			<item value="Ex01_OllengoNewton_Binary.zip"/>

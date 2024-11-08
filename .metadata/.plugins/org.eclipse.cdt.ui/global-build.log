@@ -1,14 +1,7 @@
-11:26:03 **** Incremental Build of configuration Debug for project Digital_Accelerometer ****
+18:33:12 **** Incremental Build of configuration Debug for project RFID_Gym_Member_Management_System ****
 make -j12 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F446xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/newto/STM32CubeIDE/workspace_1.16.0/Digital_Accelerometer/mma7660fc/Inc" -I"C:/Users/newto/STM32CubeIDE/workspace_1.16.0/Digital_Accelerometer/LCD_Driver/LCD_Driver/Inc" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "Digital_Accelerometer.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\newto\STM32CubeIDE\workspace_1.16.0\Digital_Accelerometer\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Digital_Accelerometer.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: Digital_Accelerometer.elf
- 
-arm-none-eabi-size  Digital_Accelerometer.elf 
-arm-none-eabi-objdump -h -S Digital_Accelerometer.elf  > "Digital_Accelerometer.list"
+arm-none-eabi-size  RFID_Gym_Member_Management_System.elf 
    text	   data	    bss	    dec	    hex	filename
-  32776	    468	   2220	  35464	   8a88	Digital_Accelerometer.elf
+  38288	    468	   2668	  41424	   a1d0	RFID_Gym_Member_Management_System.elf
 Finished building: default.size.stdout
- 
-Finished building: Digital_Accelerometer.list
  

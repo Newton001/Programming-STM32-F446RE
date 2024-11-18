@@ -1,5 +1,5 @@
 RC522/Src/rc522.o: ../RC522/Src/rc522.c \
- C:/Users/newto/STM32CubeIDE/workspace_1.16.0/RFID_Gym_Member_Management_System/RC522/Inc/rc522.h \
+ C:/Users/newto/STM32CubeIDE/workspace_1.16.0/RFID_Gym_Member_Management_System/RC522/Inc/RC522.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -28,7 +28,7 @@ RC522/Src/rc522.o: ../RC522/Src/rc522.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/spi.h ../Core/Inc/main.h
-C:/Users/newto/STM32CubeIDE/workspace_1.16.0/RFID_Gym_Member_Management_System/RC522/Inc/rc522.h:
+C:/Users/newto/STM32CubeIDE/workspace_1.16.0/RFID_Gym_Member_Management_System/RC522/Inc/RC522.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:

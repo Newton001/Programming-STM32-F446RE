@@ -2,5 +2,4 @@
 ../Core/Src/main.c:138:6:SystemClock_Config	3
 ../Core/Src/main.c:178:5:_write	2
 ../Core/Src/main.c:187:6:displayWelcome	1
-../Core/Src/main.c:198:6:Read_First_Tag	3
-../Core/Src/main.c:235:6:Error_Handler	1
+../Core/Src/main.c:206:6:Error_Handler	1

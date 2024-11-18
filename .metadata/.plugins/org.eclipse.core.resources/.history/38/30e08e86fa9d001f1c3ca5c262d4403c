@@ -1,0 +1,207 @@
+#include "rc522.h"
+#include "stm32f4xx_hal.h"
+
+// SPI handle
+extern SPI_HandleTypeDef hspi1;
+
+// Transfers a byte of data via SPI and returns the received byte
+uint8_t RC522_SPI_Transfer(uint8_t tx_data)
+{
+    uint8_t rx_data = 0;
+    HAL_SPI_TransmitReceive(&hspi1, &tx_data, &rx_data, 1, HAL_MAX_DELAY);
+    return rx_data;
+}
+
+// Writes a value to a specific RC522 register
+void write_RC522(uint8_t ADD, uint8_t val)
+{
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET); // Select the RFID module
+    RC522_SPI_Transfer((ADD << 1) & 0x7E);                 // Send address byte with write bit
+    RC522_SPI_Transfer(val);                                // Send the value to write
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);    // Deselect the RFID module
+}
+
+// Reads a value from a specific RC522 register
+uint8_t read_RC522(uint8_t addr)
+{
+    uint8_t val = 0;
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);          // Select RFID
+    RC522_SPI_Transfer(((addr << 1) & 0x7E) | 0x80);               // Send address byte with read bit
+    val = RC522_SPI_Transfer(0x00);                                 // Dummy byte to read response
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);            // Deselect RFID
+    return val;
+}
+
+// Sets specific bits of a register
+void SetBitMask(uint8_t reg, uint8_t mask)
+{
+    uint8_t temp = read_RC522(reg);
+    write_RC522(reg, temp | mask); // Set bits defined by mask
+}
+
+// Clears specific bits of a register
+void ClearBitMask(uint8_t reg, uint8_t mask)
+{
+    uint8_t temp = read_RC522(reg);
+    write_RC522(reg, temp & (~mask)); // Clear bits defined by mask
+}
+
+// Turns on the antenna of the RC522 module
+void antenna_on(void)
+{
+    uint8_t controlRegVal = read_RC522(TxControlReg);
+    if ((controlRegVal & 0x03) != 0x03) // Check if bits are already set
+    {
+        write_RC522(TxControlReg, controlRegVal | 0x03); // Turn on TX1 and TX2
+    }
+}
+
+// Turns off the antenna of the RC522 module
+void antenna_off(void)
+{
+    ClearBitMask(TxControlReg, 0x03); // Clear TX1 and TX2 bits
+}
+
+// Resets the RC522 module
+void RC522_Reset(void)
+{
+    write_RC522(CommandReg, PCD_RESETPHASE);
+    HAL_Delay(50); // Allow reset to take effect
+}
+
+// Initializes the RC522 module
+void RC522_Init(void)
+{
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
+
+    RC522_Reset();
+
+    // Configure timer and other settings for RC522
+    write_RC522(TModeReg, 0x8D);
+    write_RC522(TPrescalerReg, 0x3E);
+    write_RC522(TReloadRegL, 30);
+    write_RC522(TReloadRegH, 0);
+
+    // Set modulation settings
+    write_RC522(TxASKReg, 0x40);
+    write_RC522(ModeReg, 0x3D);
+
+    // Turn on the antenna
+    antenna_on();
+}
+
+// Checks for a new RFID tag
+uint8_t RC522_Request(uint8_t reqMode, uint8_t *TagType)
+{
+    uint8_t status;
+    uint8_t backBits;
+
+    write_RC522(BitFramingReg, 0x07); // Set bit framing
+    TagType[0] = reqMode;
+    status = RC522_ToCard(PCD_TRANSCEIVE, TagType, 1, TagType, &backBits);
+
+    if ((status != MI_OK) || (backBits != 0x10))
+    {
+        status = MI_ERR;
+    }
+    return status;
+}
+
+// Main function to communicate with RFID card
+uint8_t RC522_ToCard(uint8_t command, uint8_t *sendData, uint8_t sendLen, uint8_t *backData, uint8_t *backLen)
+{
+    uint8_t status = MI_ERR;
+    uint8_t irqEn = 0x00;
+    uint8_t waitIRq = 0x00;
+    uint8_t lastBits;
+    uint8_t n;
+    uint16_t i;
+
+    switch (command)
+    {
+        case PCD_AUTHENT:
+            irqEn = 0x12;
+            waitIRq = 0x10;
+            break;
+        case PCD_TRANSCEIVE:
+            irqEn = 0x77;
+            waitIRq = 0x30;
+            break;
+        default:
+            break;
+    }
+
+    // Enable IRQ, clear interrupt request bits, and flush FIFO
+    write_RC522(ComIEnReg, irqEn | 0x80);
+    ClearBitMask(ComIrqReg, 0x80);
+    SetBitMask(FIFOLevelReg, 0x80);
+    write_RC522(CommandReg, PCD_IDLE);
+
+    for (i = 0; i < sendLen; ++i)
+    {
+        write_RC522(FIFODataReg, sendData[i]);
+    }
+
+    // Start the command
+    write_RC522(CommandReg, command);
+    if (command == PCD_TRANSCEIVE)
+    {
+        SetBitMask(BitFramingReg, 0x80); // Start sending data
+    }
+
+    // Wait for the command to complete (or timeout)
+    i = 2000;
+    do
+    {
+        n = read_RC522(ComIrqReg);
+        i--;
+    } while ((i != 0) && !(n & 0x01) && !(n & waitIRq));
+
+    // Stop sending data
+    ClearBitMask(BitFramingReg, 0x80);
+
+    if (i != 0)
+    {
+        if (!(read_RC522(ErrorReg) & 0x1B))
+        {
+            status = MI_OK;
+            if (n & irqEn & 0x01)
+            {
+                status = MI_NOTAGERR;
+            }
+            if (command == PCD_TRANSCEIVE)
+            {
+                n = read_RC522(FIFOLevelReg);
+                lastBits = read_RC522(ControlReg) & 0x07;
+                if (lastBits)
+                {
+                    *backLen = (n - 1) * 8 + lastBits;
+                }
+                else
+                {
+                    *backLen = n * 8;
+                }
+
+                if (n == 0)
+                {
+                    n = 1;
+                }
+                if (n > MAX_LEN)
+                {
+                    n = MAX_LEN;
+                }
+
+                for (i = 0; i < n; ++i)
+                {
+                    backData[i] = read_RC522(FIFODataReg);
+                }
+            }
+        }
+        else
+        {
+            status = MI_ERR;
+        }
+    }
+    return status;
+}

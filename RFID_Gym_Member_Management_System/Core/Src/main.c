@@ -82,6 +82,7 @@ int main(void)
 	HAL_Init();
 
 	/* USER CODE BEGIN Init */
+	//RC522_Init();
 
 	/* USER CODE END Init */
 
@@ -125,7 +126,6 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		Read_First_Tag();
 		HAL_Delay(1000);  // Delay to avoid continuous polling
 	}
 	/* USER CODE END 3 */
@@ -195,35 +195,6 @@ void displayWelcome()
 
 
 // Main function to read the first RFID tag and write it to UART
-void Read_First_Tag(void)
-{
-	uint8_t status;
-	uint8_t TagType[2];
-	uint8_t serNum[5];
-
-	// Request to find a card
-	status = RC522_Request(PICC_REQIDL, TagType);
-	if (status == MI_OK)
-	{
-		printf("Card detected. Type: 0x%02X 0x%02X\r\n", TagType[0], TagType[1]);
-
-		// Perform anti-collision to get the serial number
-		status = RC522_Anticoll(serNum);
-		if (status == MI_OK)
-		{
-			printf("Card Serial Number: 0x%02X 0x%02X 0x%02X 0x%02X 0x%02X\r\n", serNum[0], serNum[1], serNum[2], serNum[3], serNum[4]);
-		}
-		else
-		{
-			printf("Error reading serial number\r\n");
-		}
-	}
-	else
-	{
-		printf("No card detected\r\n");
-	}
-}
-
 
 
 /* USER CODE END 4 */

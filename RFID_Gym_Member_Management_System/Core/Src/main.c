@@ -32,6 +32,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+RC522_HandleTypeDef rc522;
 
 /* USER CODE END PTD */
 
@@ -56,7 +57,6 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 void displayWelcome(void);
 int _write(int fd, char *ptr, int len);
-void Read_First_Tag(void);
 
 /* USER CODE END PFP */
 
@@ -97,7 +97,6 @@ int main(void)
 	MX_GPIO_Init();
 	MX_USART2_UART_Init();
 	MX_SPI1_Init();
-	MX_SPI2_Init();
 	/* USER CODE BEGIN 2 */
 
 	displayWelcome();
@@ -117,6 +116,12 @@ int main(void)
 	HAL_Delay(2500);
 	lcd_clear();
 
+	// Initialize the RC522 RFID Module
+	RC522_Init(&rc522, &hspi1, RFID_CS_N_GPIO_Port, RFID_CS_N_Pin, RC522_RESET_GPIO_Port, RC522_RESET_Pin);
+	uint8_t status;
+	uint8_t tagType[2];
+	uint8_t serNum[5];
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -126,7 +131,37 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		HAL_Delay(1000);  // Delay to avoid continuous polling
+		status = RC522_Request(&rc522, PICC_REQIDL, tagType);
+		if(status == MI_OK){
+			printf("Card Detected!\n");
+
+		// Anti Collision Detection
+		status = RC522_Anticoll(&rc522, serNum);
+		if(status==MI_OK)
+		{
+			printf("Card Serial Number: ");
+			for(int i = 0; i<4; i++)
+			{
+				printf("%02X ", serNum[i]);
+			}
+			printf("\n");
+
+			status = RC522_SelectTag(&rc522, serNum);
+			if(status == MI_OK)
+			{
+				printf("Card selected successfully!\n");
+			} else {
+				printf("Failed to select card.\n");
+			}
+		}
+		else {
+			printf("Anti-collision failed.\n");
+		}
+		}else
+		{
+			printf("No card detected.\n");
+		}
+		HAL_Delay(500);  // Delay to avoid continuous polling
 	}
 	/* USER CODE END 3 */
 }

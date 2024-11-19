@@ -1,5 +1,0 @@
-../Core/Src/main.c:72:5:main	1
-../Core/Src/main.c:138:6:SystemClock_Config	3
-../Core/Src/main.c:178:5:_write	2
-../Core/Src/main.c:187:6:displayWelcome	1
-../Core/Src/main.c:206:6:Error_Handler	1

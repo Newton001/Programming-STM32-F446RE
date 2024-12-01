@@ -1,0 +1,177 @@
+/*
+ * MFRC522_Driver.c
+ *
+ *  Created on: Nov 22, 2024
+ *      Author: newton
+ */
+
+#include "MFRC522_Driver.h"
+#include <string.h>
+#include "gpio.h"
+
+// Initialize the RC522 module
+void RC522_Init(RC522_HandleTypeDef *rc522, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csPort, uint16_t csPin, GPIO_TypeDef *rstPort, uint16_t rstPin) {
+    rc522->hspi = hspi;
+    rc522->csPort = csPort;
+    rc522->csPin = csPin;
+    rc522->rstPort = rstPort;
+    rc522->rstPin = rstPin;
+
+    // Perform a reset
+    HAL_GPIO_WritePin(rc522->rstPort, rc522->rstPin, GPIO_PIN_RESET);
+    HAL_Delay(10);
+    HAL_GPIO_WritePin(rc522->rstPort, rc522->rstPin, GPIO_PIN_SET);
+    HAL_Delay(50);
+
+    // Configure initial settings
+    RC522_WriteRegister(rc522, TModeReg, 0x80);
+    RC522_WriteRegister(rc522, TPrescalerReg, 0xA9);
+    RC522_WriteRegister(rc522, TReloadRegH, 0x03);
+    RC522_WriteRegister(rc522, TReloadRegL, 0xE8);
+    RC522_WriteRegister(rc522, TxASKReg, 0x40);
+    RC522_WriteRegister(rc522, ModeReg, 0x3D);
+    RC522_SetRegisterBits(rc522, TxControlReg, 0x03); // Enable antenna
+}
+
+// Reset the RC522 module
+void RC522_Reset(RC522_HandleTypeDef *rc522) {
+    RC522_WriteRegister(rc522, CommandReg, PCD_SOFTRESET);
+    HAL_Delay(50);
+}
+
+// Write a byte to a specified register
+void RC522_WriteRegister(RC522_HandleTypeDef *rc522, uint8_t reg, uint8_t value) {
+    uint8_t data[] = { (reg << 1) & 0x7E, value };
+    HAL_GPIO_WritePin(rc522->csPort, rc522->csPin, GPIO_PIN_RESET);
+    HAL_SPI_Transmit(rc522->hspi, data, 2, HAL_MAX_DELAY);
+    HAL_GPIO_WritePin(rc522->csPort, rc522->csPin, GPIO_PIN_SET);
+}
+
+// Read a byte from a specified register
+uint8_t RC522_ReadRegister(RC522_HandleTypeDef *rc522, uint8_t reg) {
+    uint8_t address = ((reg << 1) & 0x7E) | 0x80;
+    uint8_t value;
+    HAL_GPIO_WritePin(rc522->csPort, rc522->csPin, GPIO_PIN_RESET);
+    HAL_SPI_Transmit(rc522->hspi, &address, 1, HAL_MAX_DELAY);
+    HAL_SPI_Receive(rc522->hspi, &value, 1, HAL_MAX_DELAY);
+    HAL_GPIO_WritePin(rc522->csPort, rc522->csPin, GPIO_PIN_SET);
+    return value;
+}
+
+// Set specific bits in a register
+void RC522_SetRegisterBits(RC522_HandleTypeDef *rc522, uint8_t reg, uint8_t mask) {
+    uint8_t tmp = RC522_ReadRegister(rc522, reg);
+    RC522_WriteRegister(rc522, reg, tmp | mask);
+}
+
+// Clear specific bits in a register
+void RC522_ClearRegisterBits(RC522_HandleTypeDef *rc522, uint8_t reg, uint8_t mask) {
+    uint8_t tmp = RC522_ReadRegister(rc522, reg);
+    RC522_WriteRegister(rc522, reg, tmp & (~mask));
+}
+
+// Request for card presence
+uint8_t RC522_Request(RC522_HandleTypeDef *rc522, uint8_t reqMode, uint8_t *TagType) {
+    uint8_t status;
+    uint8_t backBits;
+
+    RC522_WriteRegister(rc522, BitFramingReg, 0x07);
+    TagType[0] = reqMode;
+    status = RC522_TransceiveData(rc522, TagType, 1, TagType, &backBits);
+
+    if ((status != MI_OK) || (backBits != 0x10)) {
+        status = MI_ERR;
+    }
+    return status;
+}
+
+// Transceive data with RC522
+uint8_t RC522_TransceiveData(RC522_HandleTypeDef *rc522, uint8_t *sendData, uint8_t sendLen, uint8_t *backData, uint8_t *backLen) {
+    uint8_t waitIRq = 0x30; // RxIRq and IdleIRq
+    uint8_t n;
+    uint32_t i;
+
+    // Set bit framing and flush FIFO buffer
+    RC522_WriteRegister(rc522, CommandReg, PCD_IDLE);
+    RC522_WriteRegister(rc522, ComIrqReg, 0x7F);
+    RC522_SetRegisterBits(rc522, FIFOLevelReg, 0x80);
+
+    // Write data to FIFO
+    for (i = 0; i < sendLen; i++) {
+        RC522_WriteRegister(rc522, FIFODataReg, sendData[i]);
+    }
+    RC522_WriteRegister(rc522, CommandReg, PCD_TRANSCEIVE);
+    RC522_SetRegisterBits(rc522, BitFramingReg, 0x80); // Start sending
+
+    // Wait for transmission to complete
+    i = 2000;
+    do {
+        n = RC522_ReadRegister(rc522, ComIrqReg);
+        i--;
+    } while ((i != 0) && !(n & waitIRq) && !(n & 0x01));
+
+    // Stop sending
+    RC522_ClearRegisterBits(rc522, BitFramingReg, 0x80);
+
+    if (i != 0) {
+        if (!(RC522_ReadRegister(rc522, ErrorReg) & 0x1B)) {
+            *backLen = RC522_ReadRegister(rc522, FIFOLevelReg);
+            for (i = 0; i < *backLen; i++) {
+                backData[i] = RC522_ReadRegister(rc522, FIFODataReg);
+            }
+            return MI_OK;
+        } else {
+            return MI_ERR;
+        }
+    }
+    return MI_TIMEOUT;
+}
+
+// DMA Transmit
+HAL_StatusTypeDef RC522_Transmit_DMA(RC522_HandleTypeDef *rc522, uint8_t *pData, uint16_t Size) {
+    HAL_GPIO_WritePin(rc522->csPort, rc522->csPin, GPIO_PIN_RESET);
+    return HAL_SPI_Transmit_DMA(rc522->hspi, pData, Size);
+}
+
+// DMA Receive
+HAL_StatusTypeDef RC522_Receive_DMA(RC522_HandleTypeDef *rc522, uint8_t *pData, uint16_t Size) {
+    HAL_GPIO_WritePin(rc522->csPort, rc522->csPin, GPIO_PIN_RESET);
+    return HAL_SPI_Receive_DMA(rc522->hspi, pData, Size);
+}
+
+// DMA Transmit and Receive
+HAL_StatusTypeDef RC522_TransmitReceive_DMA(RC522_HandleTypeDef *rc522, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size) {
+    HAL_GPIO_WritePin(rc522->csPort, rc522->csPin, GPIO_PIN_RESET);
+    return HAL_SPI_TransmitReceive_DMA(rc522->hspi, pTxData, pRxData, Size);
+}
+
+// Interrupt-based Transmit
+HAL_StatusTypeDef RC522_Transmit_IT(RC522_HandleTypeDef *rc522, uint8_t *pData, uint16_t Size) {
+    HAL_GPIO_WritePin(rc522->csPort, rc522->csPin, GPIO_PIN_RESET);
+    return HAL_SPI_Transmit_IT(rc522->hspi, pData, Size);
+}
+
+// Interrupt-based Receive
+HAL_StatusTypeDef RC522_Receive_IT(RC522_HandleTypeDef *rc522, uint8_t *pData, uint16_t Size) {
+    HAL_GPIO_WritePin(rc522->csPort, rc522->csPin, GPIO_PIN_RESET);
+    return HAL_SPI_Receive_IT(rc522->hspi, pData, Size);
+}
+
+// Interrupt-based Transmit and Receive
+HAL_StatusTypeDef RC522_TransmitReceive_IT(RC522_HandleTypeDef *rc522, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size) {
+    HAL_GPIO_WritePin(rc522->csPort, rc522->csPin, GPIO_PIN_RESET);
+    return HAL_SPI_TransmitReceive_IT(rc522->hspi, pTxData, pRxData, Size);
+}
+
+// Callbacks
+void RC522_TxCpltCallback(void) {
+    HAL_GPIO_WritePin(GPIOB, MFRC522_CS_N_Pin, GPIO_PIN_SET);
+}
+
+void RC522_RxCpltCallback(void) {
+    HAL_GPIO_WritePin(GPIOB, MFRC522_CS_N_Pin, GPIO_PIN_SET);
+}
+
+void RC522_ErrorCallback(void) {
+    HAL_GPIO_WritePin(GPIOB, MFRC522_CS_N_Pin, GPIO_PIN_SET);
+}

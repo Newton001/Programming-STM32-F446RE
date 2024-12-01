@@ -1,0 +1,84 @@
+2024-11-29 07:33:48,683 [INFO] WebApp:189 - Connection lost
+2024-11-29 07:34:00,005 [INFO] WebApp:186 - Connection restablished
+2024-11-29 07:35:45,146 [INFO] WebApp:189 - Connection lost
+2024-11-29 07:35:45,282 [INFO] WebApp:186 - Connection restablished
+2024-11-29 08:23:16,800 [INFO] WebApp:189 - Connection lost
+2024-11-29 08:23:28,259 [INFO] WebApp:186 - Connection restablished
+2024-11-29 08:23:30,120 [INFO] WebApp:189 - Connection lost
+2024-11-29 08:23:30,232 [INFO] WebApp:186 - Connection restablished
+2024-11-29 08:35:21,641 [INFO] WebApp:189 - Connection lost
+2024-11-29 08:35:21,754 [INFO] WebApp:186 - Connection restablished
+2024-11-29 10:13:14,602 [INFO] WebApp:189 - Connection lost
+2024-11-29 10:13:33,292 [INFO] WebApp:186 - Connection restablished
+2024-11-29 10:15:10,142 [INFO] WebApp:189 - Connection lost
+2024-11-29 10:15:10,300 [INFO] WebApp:186 - Connection restablished
+2024-11-29 10:44:09,301 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 302964208 Bytes (985661440)
+2024-11-29 10:44:23,542 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 327227992 Bytes (985661440)
+2024-11-29 10:44:23,763 [INFO] UtilMem:75 - End SaveConfig() Used Memory: 355915248 Bytes (985661440)
+2024-11-29 10:44:23,871 [INFO] ProjectBuilder:2334 - IP not ready for code generation: FATFS
+2024-11-29 10:44:23,872 [INFO] ProjectBuilder:2320 - IP not ready for code generation: Clock
+2024-11-29 10:44:25,698 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: SDIO
+2024-11-29 10:44:25,698 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: SYS
+2024-11-29 10:44:25,698 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: ADC
+2024-11-29 10:44:25,698 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: RCC
+2024-11-29 10:44:25,698 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: NVIC
+2024-11-29 10:44:25,698 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: GPIO
+2024-11-29 10:44:25,698 [INFO] BlockDiagram:2766 - set Specific Code input for plugin: FATFS
+2024-11-29 10:44:25,700 [INFO] CodeGenerator:807 - code generatio: config db path: C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.common.mx_6.12.1.202409122256\\db\
+2024-11-29 10:44:25,855 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\license.tmp_save
+2024-11-29 10:44:25,966 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\license.tmp
+2024-11-29 10:44:26,034 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\gpio.tmp_save
+2024-11-29 10:44:26,107 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\gpio.tmp
+2024-11-29 10:44:26,298 [INFO] Middleware:1439 - No code input for Bsp Dependency
+2024-11-29 10:44:26,310 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_HalInit.tmp_save
+2024-11-29 10:44:26,390 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_HalInit.tmp
+2024-11-29 10:44:26,400 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_vars.tmp_save
+2024-11-29 10:44:26,454 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_vars.tmp
+2024-11-29 10:44:26,463 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_ext_vars.tmp_save
+2024-11-29 10:44:26,519 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_ext_vars.tmp
+2024-11-29 10:44:26,528 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_inc.tmp_save
+2024-11-29 10:44:26,584 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_inc.tmp
+2024-11-29 10:44:26,610 [INFO] Middleware:1439 - No code input for Bsp Dependency
+2024-11-29 10:44:26,618 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_HalInit.tmp_save
+2024-11-29 10:44:26,664 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_HalInit.tmp
+2024-11-29 10:44:26,668 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_vars.tmp_save
+2024-11-29 10:44:26,708 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_vars.tmp
+2024-11-29 10:44:26,712 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_ext_vars.tmp_save
+2024-11-29 10:44:26,748 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_ext_vars.tmp
+2024-11-29 10:44:26,751 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_inc.tmp_save
+2024-11-29 10:44:26,783 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\fatfs_inc.tmp
+2024-11-29 10:44:26,798 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\Target\ffconf.h_save
+2024-11-29 10:44:26,887 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\Target\ffconf.h
+2024-11-29 10:44:26,909 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\Target\bsp_driver_sd.c_save
+2024-11-29 10:44:26,970 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\Target\bsp_driver_sd.c
+2024-11-29 10:44:26,986 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\Target\bsp_driver_sd.h_save
+2024-11-29 10:44:27,042 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\Target\bsp_driver_sd.h
+2024-11-29 10:44:27,053 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\Target\sd_diskio.h_save
+2024-11-29 10:44:27,101 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\Target\sd_diskio.h
+2024-11-29 10:44:27,110 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\Target\sd_diskio.c_save
+2024-11-29 10:44:27,187 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\Target\sd_diskio.c
+2024-11-29 10:44:27,198 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\App\fatfs.c_save
+2024-11-29 10:44:27,261 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\App\fatfs.c
+2024-11-29 10:44:27,270 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\App\fatfs.h_save
+2024-11-29 10:44:27,325 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\FATFS\App\fatfs.h
+2024-11-29 10:44:27,351 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Src\stm32f4xx_it.c_save
+2024-11-29 10:44:27,461 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Src\stm32f4xx_it.c
+2024-11-29 10:44:27,478 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Inc\stm32f4xx_it.h_save
+2024-11-29 10:44:27,532 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Inc\stm32f4xx_it.h
+2024-11-29 10:44:27,561 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Src\stm32f4xx_hal_msp.c_save
+2024-11-29 10:44:27,654 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Src\stm32f4xx_hal_msp.c
+2024-11-29 10:44:27,665 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\system.tmp_save
+2024-11-29 10:44:27,709 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\MXTmpFiles\system.tmp
+2024-11-29 10:44:27,739 [INFO] CodeEngine:311 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Inc\stm32f4xx_hal_conf.h_save
+2024-11-29 10:44:27,812 [INFO] CodeEngine:335 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Inc\stm32f4xx_hal_conf.h
+2024-11-29 10:44:27,837 [WARN] IPConfigManager:3005 - Warning: the RefConfig PLL2P_FOR_MCO is not available in your config.xml file
+2024-11-29 10:44:27,866 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Inc\main.h_save
+2024-11-29 10:44:27,931 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Inc\main.h
+2024-11-29 10:44:27,951 [INFO] CodeEngine:255 - oldGeneratedFile, C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Src\main.c_save
+2024-11-29 10:44:28,039 [INFO] CodeEngine:279 - Generated code: C:\Users\newto\STM32CubeIDE\workspace_1.16.0\SD_CARD_READER\Core\Src\main.c
+2024-11-29 10:44:28,415 [INFO] ProjectBuilder:3249 - Time for Copy HAL[1] : 201mS.
+2024-11-29 10:44:28,419 [INFO] ProjectBuilder:4828 - Project Generator version: 4.5.0-B34
+2024-11-29 10:44:28,473 [INFO] ConfigFileManager:1531 - The Die is : DIE421
+2024-11-29 10:44:29,226 [INFO] ProjectBuilder:5097 - Time for Generating toolchain IDE Files: 808mS.
+2024-11-29 10:44:29,227 [INFO] ProjectBuilder:3107 - Time for Copy CMSIS : 1mS.
+2024-11-29 10:44:29,233 [INFO] ProjectBuilder:3107 - Time for Copy CMSIS : 0mS.

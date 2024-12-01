@@ -18,6 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
+#include "dac.h"
+#include "dma.h"
+#include "tim.h"
+#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -33,11 +38,12 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define SAMPLES 200
-#define res_10b 2048  // Adjust based on DAC resolution
-#define PI  3.14155926
-#define res_8b 256
-#define res_12b 4096
+#define SAMPLES 256 // Number of samples in one sine wave cycle
+#define PI 3.14159265359
+#define DAC_MAX_VALUE 4095 // 12-bit DAC resolution
+#define ADC_RESOLUTION 4095 // 12-bit ADC resolution
+#define BASE_FREQUENCY 1000 // Default frequency in Hz (1 kHz)
+#define SYSTEM_CLOCK 180000000 // STM32F446RE at 180 MHz
 
 /* USER CODE END PD */
 
@@ -47,28 +53,44 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-DAC_HandleTypeDef hdac;
-DMA_HandleTypeDef hdma_dac2;
-
-TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN PV */
 uint32_t sine_wave[SAMPLES];
+uint32_t adc_values[2];
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
-static void MX_DAC_Init(void);
-static void MX_TIM7_Init(void);
 /* USER CODE BEGIN PFP */
 
-void generate_sine_wave(void) {
+void generate_sine_wave(uint16_t amplitude) {
 	for (int i = 0; i < SAMPLES; i++) {
-		sine_wave[i] = ((sin(i *2 * PI/SAMPLES) + 1)) * res_12b/2;
+		sine_wave[i] = (uint16_t)((amplitude / 2) * (sin(2 * PI * i/SAMPLES) + 1));
 	}
+}
+
+void adjustFrequency(TIM_HandleTypeDef *htim, uint32_t adc_value){
+
+	uint32_t frequency = 500 + ((adc_value * 9500) / ADC_RESOLUTION);
+	// Calculate new ARR value based on frequency and sample count
+	uint32_t timer_frequency = frequency * SAMPLES;
+	uint32_t arr_value = (SYSTEM_CLOCK / ((htim->Init.Prescaler + 1) * timer_frequency)) - 1;
+
+	// Update ARR register for the timer
+	__HAL_TIM_SET_AUTORELOAD(htim, arr_value);
+}
+
+// ADC DMA transfer complete callback
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
+    if (hadc->Instance == ADC1) {
+        // Adjust amplitude and regenerate sine wave
+        uint16_t amplitude = (uint16_t)((adc_values[0] * DAC_MAX_VALUE) / ADC_RESOLUTION);
+        generate_sine_wave(amplitude);
+
+        // Adjust frequency dynamically
+        adjustFrequency(&htim7, adc_values[1]);
+    }
 }
 
 /* USER CODE END PFP */
@@ -110,12 +132,17 @@ int main(void)
   MX_DMA_Init();
   MX_DAC_Init();
   MX_TIM7_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
-  generate_sine_wave();
+	generate_sine_wave(DAC_MAX_VALUE);
 
-  HAL_TIM_Base_Start(&htim7);
-  HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_2, sine_wave, SAMPLES, DAC_ALIGN_12B_R);
+	HAL_TIM_Base_Start(&htim7);
+	HAL_DAC_Start_DMA(&hdac, DAC_CHANNEL_2, sine_wave, SAMPLES, DAC_ALIGN_12B_R);
+
+	// Start ADC in DMA mode
+	HAL_ADC_Start_DMA(&hadc1, adc_values, 2);
+
 
 
   /* USER CODE END 2 */
@@ -183,127 +210,6 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-}
-
-/**
-  * @brief DAC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_DAC_Init(void)
-{
-
-  /* USER CODE BEGIN DAC_Init 0 */
-
-  /* USER CODE END DAC_Init 0 */
-
-  DAC_ChannelConfTypeDef sConfig = {0};
-
-  /* USER CODE BEGIN DAC_Init 1 */
-
-  /* USER CODE END DAC_Init 1 */
-
-  /** DAC Initialization
-  */
-  hdac.Instance = DAC;
-  if (HAL_DAC_Init(&hdac) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** DAC channel OUT2 config
-  */
-  sConfig.DAC_Trigger = DAC_TRIGGER_T7_TRGO;
-  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
-  if (HAL_DAC_ConfigChannel(&hdac, &sConfig, DAC_CHANNEL_2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN DAC_Init 2 */
-
-  /* USER CODE END DAC_Init 2 */
-
-}
-
-/**
-  * @brief TIM7 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_TIM7_Init(void)
-{
-
-  /* USER CODE BEGIN TIM7_Init 0 */
-
-  /* USER CODE END TIM7_Init 0 */
-
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-
-  /* USER CODE BEGIN TIM7_Init 1 */
-
-  /* USER CODE END TIM7_Init 1 */
-  htim7.Instance = TIM7;
-  htim7.Init.Prescaler = 180-1;
-  htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim7.Init.Period = 10-1;
-  htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN TIM7_Init 2 */
-
-  /* USER CODE END TIM7_Init 2 */
-
-}
-
-/**
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void)
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA1_Stream6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
-
-}
-
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-	/* GPIO Ports Clock Enable */
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-
-	/* Configure GPIO pin: PA5 */
-	GPIO_InitStruct.Pin = GPIO_PIN_5;
-	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG; // Set to Analog mode
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-/* USER CODE END MX_GPIO_Init_1 */
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */

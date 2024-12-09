@@ -28,6 +28,7 @@
 #include "stdio.h"
 #include "lcd_driver.h"
 #include "MFRC522_Driver.h"
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -43,16 +44,12 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-RC522_HandleTypeDef rc522;
 
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
-uint8_t cardUID[10];
-uint8_t cardData[16];
 
 /* USER CODE END PV */
 
@@ -66,6 +63,9 @@ void lcd_initialize(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint8_t readValue;
+void HAL_ReadCardUIDAndReadBlocks();
+void HAL_WriteToBlocks();
 
 /* USER CODE END 0 */
 
@@ -100,17 +100,17 @@ int main(void)
 	MX_GPIO_Init();
 	MX_USART2_UART_Init();
 	MX_SPI1_Init();
+	MX_SPI2_Init();
 	/* USER CODE BEGIN 2 */
 
 	// Initialize the LCD
 	lcd_initialize();
 
-	// Initialize the MFRC522 Module
-	RC522_Init(&rc522,&hspi1, GPIOB, MFRC522_CS_N_Pin,MFRC522_RESET_GPIO_Port, MFRC522_RESET_Pin);
-
-	// Buffer to store tag type
-	uint8_t tagType[2];
-
+	//Initialize PCD
+	PCD_Init();
+	printf("Checking for cards...\n");
+	HAL_ReadCardUIDAndReadBlocks();
+	HAL_WriteToBlocks();
 
 	/* USER CODE END 2 */
 
@@ -118,34 +118,12 @@ int main(void)
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		// Request for card presence
-		if (RC522_Request(&rc522, PICC_REQA, tagType) == STATUS_OK) {
-			HAL_Delay(100); // Small delay to stabilize reading
+		// Write a value to the register
 
-			// Perform anti-collision to get the UID
-			if (RC522_Anticoll(&rc522, cardUID) == STATUS_OK) {
-				// Select the card
-				if (RC522_SelectTag(&rc522, cardUID) == STATUS_OK) {
-					// Read data block 4 from the card
-					if (RC522_Read(&rc522, 4, cardData) == STATUS_OK) {
-						// Print UID and data (Replace printf with proper HAL_UART transmit if needed)
-						printf("Card UID: ");
-						for (uint8_t i = 0; i < 4; i++) {
-							printf("%02X ", cardUID[i]);
-						}
-						printf("\nCard Data: ");
-						for (uint8_t i = 0; i < 16; i++) {
-							printf("%02X ", cardData[i]);
-						}
-						printf("\n");
-					}
-				}
-			}
-		}
-		printf("No Card Detected\r\n");
+		HAL_Delay(1000);
 
-		HAL_Delay(500); // Polling delay
 		/* USER CODE END WHILE */
+
 
 		/* USER CODE BEGIN 3 */
 		//printf("This is how it starts\n\r");
@@ -227,6 +205,144 @@ void lcd_initialize(void)
 	puts("- Temperature Sensor connection ... Done\r\n");
 	puts("***************************** \r\n");
 }
+
+// Test the Registers
+
+void HAL_ReadCardUIDAndReadBlocks() {
+    Uid uid;
+    MIFARE_Key key = { {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF} }; // Default key
+    uint8_t buffer[18];
+    uint8_t bufferSize = sizeof(buffer);
+    uint8_t status;
+
+    printf("Starting RFID card detection and block reading...\n");
+
+    // Check for a new card
+    if (!PICC_IsNewCardPresent()) {
+        printf("No new card detected.\n");
+        return;
+    }
+
+    if (!PICC_ReadCardSerial(&uid)) {
+        printf("Failed to read card serial.\n");
+        return;
+    }
+
+    // Output UID
+    printf("Card UID: ");
+    for (uint8_t i = 0; i < uid.size; i++) {
+        printf("%02X ", uid.uidByte[i]);
+    }
+    printf("\n");
+
+    // Authenticate and read block 4
+    printf("Authenticating block 4...\n");
+    status = PCD_Authenticate(PICC_CMD_MF_AUTH_KEY_A, 4, &key, &uid);
+    if (status != STATUS_OK) {
+        printf("Authentication failed for block 4: %s\n", GetStatusCodeName(status));
+        PCD_StopCrypto1();
+        return;
+    }
+
+    printf("Reading block 4...\n");
+    status = MIFARE_Read(4, buffer, &bufferSize);
+    if (status != STATUS_OK) {
+        printf("Read failed for block 4: %s\n", GetStatusCodeName(status));
+        PCD_StopCrypto1();
+        return;
+    }
+
+    printf("Block 4 Data: ");
+    for (uint8_t i = 0; i < bufferSize; i++) {
+        printf("%02X ", buffer[i]);
+    }
+    printf("\n");
+
+    // Authenticate and read block 7
+    printf("Authenticating block 7...\n");
+    status = PCD_Authenticate(PICC_CMD_MF_AUTH_KEY_A, 7, &key, &uid);
+    if (status != STATUS_OK) {
+        printf("Authentication failed for block 7: %s\n", GetStatusCodeName(status));
+        PCD_StopCrypto1();
+        return;
+    }
+
+    printf("Reading block 7...\n");
+    bufferSize = sizeof(buffer); // Reset buffer size
+    status = MIFARE_Read(7, buffer, &bufferSize);
+    if (status != STATUS_OK) {
+        printf("Read failed for block 7: %s\n", GetStatusCodeName(status));
+        PCD_StopCrypto1();
+        return;
+    }
+
+    printf("Block 7 Data: ");
+    for (uint8_t i = 0; i < bufferSize; i++) {
+        printf("%02X ", buffer[i]);
+    }
+    printf("\n");
+
+    // Stop crypto operations
+    PCD_StopCrypto1();
+    printf("Finished reading blocks 4 and 7.\n");
+}
+
+
+void HAL_WriteToBlocks() {
+    Uid uid;
+    MIFARE_Key key = { {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF} }; // Default key
+    uint8_t writeBufferBlock5[16] = {
+            'S', 'e', 's', 's', 'i', 'o', 'n', 's',
+            ' ', '2', ' ', ' ', ' ', ' ', ' ', ' '
+    }; // Data for block 5: "Sessions 2"
+    uint8_t status;
+
+    printf("Starting RFID card detection and block writing...");
+
+    // Check for a new card
+    if (!PICC_IsNewCardPresent()) {
+        printf("No new card detected.");
+        return;
+    }
+
+    if (!PICC_ReadCardSerial(&uid)) {
+        printf("Failed to read card serial.");
+        return;
+    }
+
+    // Output UID
+    printf("Card UID: ");
+    for (uint8_t i = 0; i < uid.size; i++) {
+        printf("%02X ", uid.uidByte[i]);
+    }
+    printf("\n");
+
+    // Authenticate and write to block 7
+    printf("Authenticating block 7...");
+    status = PCD_Authenticate(PICC_CMD_MF_AUTH_KEY_A, 7, &key, &uid);
+    if (status != STATUS_OK) {
+        printf("Authentication failed for block 7: %s", GetStatusCodeName(status));
+        PCD_StopCrypto1();
+        return;
+    }
+
+    printf("Writing to block 7...");
+    status = MIFARE_Write(7, writeBufferBlock5, sizeof(writeBufferBlock5));
+    if (status != STATUS_OK) {
+        printf("Write failed for block 7: %s", GetStatusCodeName(status));
+        PCD_StopCrypto1();
+        return;
+    }
+
+    printf("Data written successfully to block 7.");
+
+    // Stop crypto operations
+    PCD_StopCrypto1();
+    printf("Finished writing to block 7.");
+}
+
+
+
 
 /* USER CODE END 4 */
 

@@ -1,0 +1,177 @@
+/***************************************************************************************************
+ * @file       MFRC522.h
+ * @author     Newton Kelvin
+ *
+ */
+
+#include "spi.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include "MFRC522_Driver.h"
+
+
+// Function to control the Chip Select (CS) line
+static void MFRC522_Select(void) {
+	HAL_GPIO_WritePin(GPIOB, MFRC522_CS_N_Pin, GPIO_PIN_RESET);
+}
+
+static void MFRC522_Deselect(void) {
+	HAL_GPIO_WritePin(GPIOB, MFRC522_CS_N_Pin, GPIO_PIN_SET);
+}
+
+/**
+ * @brief Writes a single byte to a specified register in the MFRC522 chip.
+ * @param reg: The address of the register to write to (with MSB set to 0 for write).
+ * @param value: The value to write to the register.
+ */
+void PCD_WriteRegister(uint8_t reg, uint8_t value) {
+	uint8_t data[2];
+	data[0] = (reg & 0x7E); // Address format: MSB must be 0 for write
+	data[1] = value;
+
+	MFRC522_Select();
+	HAL_SPI_Transmit(&hspi2, data, 2, HAL_MAX_DELAY);
+	MFRC522_Deselect();
+}
+
+/**
+ * @brief Writes multiple bytes to a specified register in the MFRC522 chip.
+ * @param reg: The address of the register to write to (already shifted).
+ * @param count: The number of bytes to write.
+ * @param values: Pointer to the array of bytes to write.
+ */
+
+void PCD_WriteRegisterMulti(uint8_t reg, uint8_t count, const uint8_t *values) {
+	// Allocate a buffer for the data (register address + data bytes)
+	uint8_t buffer[count + 1];
+	buffer[0] = reg; // First byte is the register address
+
+	// Copy the values to the buffer
+	for (uint8_t i = 0; i < count; i++) {
+		buffer[i + 1] = values[i];
+	}
+
+	// Start the SPI communication
+	MFRC522_Select();
+
+	// Send the buffer over SPI
+	HAL_SPI_Transmit(&hspi2, buffer, count + 1, HAL_MAX_DELAY);
+
+	// End the SPI communication
+	MFRC522_Deselect();
+}
+
+uint8_t PCD_ReadRegister(uint8_t reg) {
+	uint8_t txData = (reg & 0x7E) | 0x80; // Address format: MSB set for read
+	uint8_t rxData = 0;
+
+	MFRC522_Select();
+
+	// Transmit the register address and read the response
+	HAL_SPI_Transmit(&hspi2, &txData, 1, HAL_MAX_DELAY);
+	HAL_SPI_Receive(&hspi2, &rxData, 1, HAL_MAX_DELAY);
+
+	MFRC522_Deselect();
+
+	return rxData;
+}
+
+/**
+ * @brief Resets the MFRC522 chip by toggling the reset pin.
+ */
+void PCD_Reset(void) {
+	HAL_GPIO_WritePin(MFRC522_RESET_GPIO_Port, MFRC522_RESET_Pin, GPIO_PIN_RESET); // Pull reset LOW
+	HAL_Delay(50);                                                            // Hold for 50 ms
+	HAL_GPIO_WritePin(MFRC522_RESET_GPIO_Port, MFRC522_RESET_Pin, GPIO_PIN_SET);  // Pull reset HIGH
+	HAL_Delay(50);                                                            // Wait for the chip to initialize
+}
+
+/**
+ * @brief Sets specific bits in a register without altering other bits.
+ * @param reg: The register address to modify.
+ * @param mask: The bitmask indicating which bits to set (1 = set bit, 0 = leave bit unchanged).
+ */
+
+void PCD_SetRegisterBits(uint8_t reg, uint8_t mask) {
+	// Read the current value of the register
+	uint8_t current = PCD_ReadRegister(reg);
+
+	// Set the bits indicated by the mask
+	PCD_WriteRegister(reg, current | mask);
+}
+
+/**
+ * @brief Turns the MFRC522 antenna on by enabling the TX1 and TX2 control bits in the TxControlReg register.
+ */
+void PCD_AntennaOn(void) {
+	uint8_t txControlReg = TxControlReg; // TxControlReg is already shifted in the defines
+
+	// Read the current value of the TxControlReg
+	uint8_t currentValue = PCD_ReadRegister(txControlReg);
+
+	// Check if the antenna is already on (bits TX1 and TX2 are set)
+	if ((currentValue & 0x03) != 0x03) {
+		// Set bits TX1 and TX2 to turn the antenna on
+		PCD_SetRegisterBits(txControlReg, 0x03);
+	}
+}
+
+void PCD_Init(void) {
+
+	PCD_Reset();
+	// Step 2: Configure the Timer
+	PCD_WriteRegister(TModeReg, 0x8D);       // Timer mode (auto-restart enabled)
+	PCD_WriteRegister(TPrescalerReg, 0x3E); // Timer prescaler (recommended value)
+	PCD_WriteRegister(TReloadRegH, 30);     // Timer reload high byte
+	PCD_WriteRegister(TReloadRegL, 0);      // Timer reload low byte
+	// Step 3: Configure the antenna gain
+	PCD_WriteRegister(RFCfgReg, 0x70); // Set maximum receiver gain
+
+	// Step 4: Turn on the antenna
+	PCD_AntennaOn();
+
+	// Step 5: Verify initialization by reading the version
+	uint8_t version = PCD_ReadRegister(VersionReg);
+	if (version != 0x91 && version != 0x92) {
+		// Initialization failed
+		printf("Error: MFRC522 initialization failed. VersionReg=0x%02X\n", version);
+	}
+	else {
+		printf("MFRC522 initialized successfully. VersionReg=0x%02X\n", version);
+	}
+
+}
+
+/**
+ * @brief Reads multiple bytes from a specified register in the MFRC522 chip.
+ * @param reg: The address of the register to read from (already shifted).
+ * @param count: The number of bytes to read.
+ * @param values: Pointer to the buffer where the read data will be stored.
+ */
+void PCD_ReadRegisterMulti(uint8_t reg, uint8_t count, uint8_t *values) {
+	if (count == 0) return; // No bytes to read
+
+	    for (uint8_t i = 0; i < count; i++) {
+	        values[i] = PCD_ReadRegister(reg); // Read each byte using PCD_ReadRegister
+	    }
+}
+
+
+void PCD_ClearFIFO(void) {
+	PCD_WriteRegister(CommandReg, 0x10); // Flush the FIFO buffer
+}
+
+void PCD_ClrRegisterBits(uint8_t reg, uint8_t mask) {
+    // Read the current value of the register
+    uint8_t current = PCD_ReadRegister(reg);
+
+    // Clear the bits specified by the mask
+    uint8_t newValue = current & (~mask);
+
+    // Write the modified value back to the register
+    PCD_WriteRegister(reg, newValue);
+}
+
+

@@ -1,7 +1,6 @@
 MFRC522_Driver/Src/MFRC522_Driver.o: \
- ../MFRC522_Driver/Src/MFRC522_Driver.c \
- C:/Users/newto/STM32CubeIDE/workspace_1.16.0/Project_RFID_SD_Card_Buzzer_ADC_LCD/MFRC522_Driver/Inc/MFRC522_Driver.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
+ ../MFRC522_Driver/Src/MFRC522_Driver.c ../Core/Inc/spi.h \
+ ../Core/Inc/main.h ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
@@ -28,8 +27,9 @@ MFRC522_Driver/Src/MFRC522_Driver.o: \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/gpio.h ../Core/Inc/main.h
-C:/Users/newto/STM32CubeIDE/workspace_1.16.0/Project_RFID_SD_Card_Buzzer_ADC_LCD/MFRC522_Driver/Inc/MFRC522_Driver.h:
+ C:/Users/newto/STM32CubeIDE/workspace_1.16.0/Project_RFID_SD_Card_Buzzer_ADC_LCD/MFRC522_Driver/Inc/MFRC522_Driver.h
+../Core/Inc/spi.h:
+../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
@@ -57,5 +57,4 @@ C:/Users/newto/STM32CubeIDE/workspace_1.16.0/Project_RFID_SD_Card_Buzzer_ADC_LCD
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-../Core/Inc/gpio.h:
-../Core/Inc/main.h:
+C:/Users/newto/STM32CubeIDE/workspace_1.16.0/Project_RFID_SD_Card_Buzzer_ADC_LCD/MFRC522_Driver/Inc/MFRC522_Driver.h:
